@@ -9,14 +9,6 @@ const nextConfig: NextConfig = {
   },
   // External packages that should NOT be bundled server-side
   serverExternalPackages: ["tesseract.js", "unpdf"],
-  webpack: (config, { webpack }) => {
-    config.plugins.push(
-      new webpack.IgnorePlugin({
-        resourceRegExp: /draco_decoder\.wasm|draco_wasm_wrapper\.js|draco_decoder\.js|boolean_wasm_bg\.wasm/,
-      })
-    );
-    return config;
-  },
 };
 
 export default nextConfig;
