@@ -106,7 +106,7 @@ function HeroBackgroundVideo() {
         }}
       />
       {/* 3D Model / Video Overlay */}
-      <div className="order-last lg:order-none relative lg:fixed lg:inset-0 lg:z-1 overflow-hidden pointer-events-none w-full aspect-square md:aspect-video lg:aspect-auto lg:h-full">
+      <div className="hidden lg:block order-last lg:order-none relative lg:fixed lg:inset-0 lg:z-1 overflow-hidden pointer-events-none w-full aspect-square md:aspect-video lg:aspect-auto lg:h-full">
         <video
           ref={videoRef}
           muted
@@ -262,12 +262,12 @@ export function MainframeHero() {
   }, [file, summaryLength, router]);
 
   return (
-    <div className="relative text-[#2d2d2d] antialiased overflow-x-hidden flex flex-col lg:block lg:min-h-screen font-sans">
+    <div className="relative text-[#2d2d2d] antialiased lg:overflow-hidden flex flex-col lg:block min-h-[100dvh] lg:h-[100dvh] font-sans">
       <CursorGlow />
       <HeroBackgroundVideo />
 
       {/* Content layer */}
-      <div className="relative z-10 flex flex-col order-first lg:order-none w-full lg:bg-transparent pb-8 lg:pb-0 lg:min-h-screen">
+      <div className="relative z-10 flex flex-col order-first lg:order-none w-full lg:bg-transparent lg:h-full pb-16 lg:pb-0 flex-1">
         <main
           id="spade-hero"
           className="w-full max-w-7xl mx-auto px-6 py-12 flex-1 flex flex-col justify-center mt-12 md:mt-0"

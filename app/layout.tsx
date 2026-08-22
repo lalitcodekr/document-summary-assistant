@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { SmoothScroll } from "@/components/SmoothScroll";
 import { CustomCursor } from "@/components/CustomCursor";
+import { Footer } from "@/components/Footer";
 
 export const metadata: Metadata = {
   title: "DocSummary — AI-Powered Document Understanding",
@@ -45,8 +46,11 @@ export default function RootLayout({
       <body className="h-full">
         <CustomCursor />
         <SmoothScroll>
-          {children}
+          <main>
+            {children}
+          </main>
         </SmoothScroll>
+        <Footer />
       </body>
     </html>
   );
