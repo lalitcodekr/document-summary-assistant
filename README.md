@@ -1,36 +1,42 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Document Summary Assistant
 
-## Getting Started
+An AI-powered document summarization tool built with Next.js, React, and Gemini API. It allows users to upload documents or paste text to generate concise summaries, extract key points, and receive improvement suggestions.
 
-First, run the development server:
+## ✨ Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **Document Parsing**: Extract text from PDF, TXT, and Image (OCR) files.
+- **AI Summarization**: Powered by Gemini 1.5 Flash to generate fast and accurate summaries.
+- **Adjustable Length**: Switch between Short, Medium, and Long summaries on the fly.
+- **Key Insights**: Automatically extracts key points and improvement suggestions.
+- **Rich UI**: Stunning interface featuring Glassmorphism, 3D interactive backgrounds (Spline), and responsive design.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🛠️ Tech Stack
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Framework**: [Next.js](https://nextjs.org/) (App Router)
+- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/) & Framer Motion
+- **AI / LLM**: [Google AI SDK](https://sdk.vercel.ai/providers/ai-sdk-providers/google-generative-ai)
+- **Parsing**: `unpdf` (PDFs), `tesseract.js` (Images)
+- **3D Graphics**: `@splinetool/react-spline`
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🚀 Getting Started
 
-## Learn More
+1. **Clone the repository** (or download the source code).
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
+3. **Configure Environment Variables**:
+   Create a `.env.local` file in the root directory and add your Gemini API key:
+   ```env
+   GEMINI_API_KEY=your_api_key_here
+   ```
+4. **Run the Development Server**:
+   ```bash
+   npm run dev
+   ```
+5. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-To learn more about Next.js, take a look at the following resources:
+## 📦 Deployment
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The easiest way to deploy this Next.js application is via [Vercel](https://vercel.com).
+Ensure that you set the `GEMINI_API_KEY` environment variable in your Vercel project settings before deploying.
