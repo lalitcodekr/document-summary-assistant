@@ -8,6 +8,8 @@ export async function ocrImage(imageBuffer: Buffer | Uint8Array): Promise<string
     const { createWorker } = await import("tesseract.js");
 
     const worker = await createWorker("eng", 1, {
+      langPath: process.cwd(),
+      cachePath: "/tmp",
       // Suppress verbose logging in production
       logger: process.env.NODE_ENV === "development"
         ? (m: { status: string; progress: number }) => {

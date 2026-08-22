@@ -6,6 +6,9 @@ const nextConfig: NextConfig = {
     serverActions: {
       bodySizeLimit: "11mb",
     },
+    outputFileTracingIncludes: {
+      "/api/**/*": ["./eng.traineddata"],
+    },
   },
   // External packages that should NOT be bundled server-side
   serverExternalPackages: ["tesseract.js", "unpdf", "@napi-rs/canvas"],
