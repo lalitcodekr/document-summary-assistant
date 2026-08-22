@@ -14,7 +14,6 @@ import { ImprovementsList } from "@/components/ImprovementsList";
 import { SummaryActions } from "@/components/SummaryActions";
 import { ExtractedTextCollapsible } from "@/components/ExtractedTextCollapsible";
 import { EmptySummaryState } from "@/components/EmptySummaryState";
-import { SplineBackground } from "@/components/SplineBackground";
 
 export default function SummaryPage() {
   const [result, setResult] = useState<ProcessResult | null>(null);
@@ -25,7 +24,6 @@ export default function SummaryPage() {
   const [error, setError] = useState("");
   const [mounted, setMounted] = useState(false);
 
-  // Load from sessionStorage on mount (client-side only)
   useEffect(() => {
     setMounted(true);
     const data = loadSummaryData();
@@ -51,7 +49,6 @@ export default function SummaryPage() {
           keyPoints: newData.keyPoints,
           improvementSuggestions: newData.improvementSuggestions,
         };
-        // Persist updated result to sessionStorage
         saveSummaryData({
           result: updated,
           documentName,
@@ -65,45 +62,51 @@ export default function SummaryPage() {
   );
 
   return (
-    <div className="min-h-screen" style={{ background: "hsl(var(--hero-bg))" }}>
-      {/* ── Interactive Spline 3D background — fixed, always present ─────── */}
-      {mounted && <SplineBackground />}
+    <div
+      className="hd-page min-h-screen"
+      style={{
+        background: "#fdfbf7",
+        backgroundImage: "radial-gradient(#e5e0d8 1px, transparent 1px)",
+        backgroundSize: "24px 24px",
+        fontFamily: "'Patrick Hand', cursive",
+      }}
+    >
+      {/* Decorative top tape strip */}
+      <div
+        aria-hidden
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          height: "4px",
+          background: "repeating-linear-gradient(90deg, #2d2d2d 0px, #2d2d2d 32px, transparent 32px, transparent 40px)",
+          zIndex: 100,
+          opacity: 0.15,
+        }}
+      />
 
-      {/* ── SSR skeleton: not mounted yet ─────────────────────────────────── */}
+      {/* SSR skeleton */}
       {!mounted && (
-        <div className="min-h-[40vh] bg-hero-bg" aria-hidden="true" />
+        <div className="min-h-[40vh]" aria-hidden="true" />
       )}
 
-      {/* ── Empty state: no document uploaded ─────────────────────────────── */}
-      {mounted && !result && (
-        <div className="relative" style={{ zIndex: 10 }}>
-          <EmptySummaryState />
-        </div>
-      )}
+      {/* Empty state */}
+      {mounted && !result && <EmptySummaryState />}
 
-      {/* ── Document summary results ───────────────────────────────────────── */}
+      {/* Document summary results */}
       {mounted && result && (
-        <div className="relative" style={{ zIndex: 10 }}>
-          {/* Soft bottom-edge green accent — purely decorative, no pointer events */}
-          <div
-            className="fixed inset-0 pointer-events-none"
-            style={{
-              zIndex: 1,
-              background:
-                "radial-gradient(ellipse 70% 50% at 50% 100%, hsla(119, 99%, 46%, 0.04) 0%, transparent 65%)",
-            }}
-          />
-
+        <div className="relative">
           {/* Sticky summary navbar */}
           <SummaryPageNavbar />
 
           {/* Main content */}
           <main
-            className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-36 pb-24"
+            className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-36 pb-24"
             aria-label="Document summary"
           >
             <motion.div
-              className="flex flex-col gap-6"
+              className="flex flex-col gap-7"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5 }}
@@ -122,22 +125,22 @@ export default function SummaryPage() {
                   onError={setError}
                 />
 
-                {/* Inline error for length switching */}
                 <AnimatePresence>
                   {error && (
                     <motion.div
-                      className="flex items-center gap-2 text-xs text-white/60"
+                      className="flex items-center gap-2 text-sm"
+                      style={{ color: "#ff4d4d", fontFamily: "'Patrick Hand', cursive" }}
                       initial={{ opacity: 0, x: -8 }}
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0 }}
                       transition={{ duration: 0.3 }}
                       role="alert"
                     >
-                      <AlertCircle className="w-3.5 h-3.5 flex-shrink-0 text-red-400/70" aria-hidden />
+                      <AlertCircle className="w-4 h-4 flex-shrink-0" aria-hidden />
                       <span>{error}</span>
                       <button
                         onClick={() => setError("")}
-                        className="text-white/40 hover:text-white/70 transition-colors ml-1"
+                        className="ml-1 hover:opacity-70 transition-opacity"
                         aria-label="Dismiss error"
                       >
                         ×
@@ -150,7 +153,7 @@ export default function SummaryPage() {
               {/* Executive summary card */}
               <SummaryCard summary={result.summary} isLoading={isLoading} />
 
-              {/* Key points */}
+              {/* Key points + Improvements */}
               <AnimatePresence mode="wait">
                 {!isLoading && (
                   <motion.div
@@ -159,22 +162,20 @@ export default function SummaryPage() {
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.3 }}
-                    className="flex flex-col gap-6"
+                    className="flex flex-col gap-7"
                   >
                     <KeyPointsList points={result.keyPoints} />
-
-                    {/* Improvement suggestions */}
                     <ImprovementsList suggestions={result.improvementSuggestions} />
                   </motion.div>
                 )}
               </AnimatePresence>
 
-              {/* Actions row */}
+              {/* Actions */}
               {!isLoading && (
                 <SummaryActions result={result} documentName={documentName} />
               )}
 
-              {/* Extracted text (collapsible) */}
+              {/* Extracted text collapsible */}
               {result.extractedTextPreview && !isLoading && (
                 <ExtractedTextCollapsible text={result.extractedTextPreview} />
               )}
@@ -182,18 +183,33 @@ export default function SummaryPage() {
               {/* New document CTA (bottom) */}
               {!isLoading && (
                 <motion.div
-                  className="flex justify-center pt-6 border-t border-white/[0.06]"
+                  className="flex justify-center pt-8"
+                  style={{
+                    borderTop: "2px dashed #2d2d2d",
+                    borderTopColor: "rgba(45,45,45,0.25)",
+                  }}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.7 }}
                 >
                   <a
                     href="/"
-                    className="flex items-center gap-2 text-sm text-white/40 hover:text-white/70 transition-colors"
+                    className="flex items-center gap-2 transition-all hover:scale-105"
+                    style={{
+                      fontFamily: "'Patrick Hand', cursive",
+                      fontSize: "1rem",
+                      color: "#2d2d2d",
+                      background: "#ffffff",
+                      border: "2px solid #2d2d2d",
+                      borderRadius: "255px 15px 225px 15px / 15px 225px 15px 255px",
+                      boxShadow: "4px 4px 0px 0px #2d2d2d",
+                      padding: "0.6rem 1.5rem",
+                      textDecoration: "none",
+                    }}
                     aria-label="Analyze another document"
                   >
-                    <RotateCcw className="w-3.5 h-3.5" aria-hidden />
-                    Analyze another document
+                    <RotateCcw className="w-4 h-4" strokeWidth={2.5} aria-hidden />
+                    ✏️ Analyse another document
                   </a>
                 </motion.div>
               )}

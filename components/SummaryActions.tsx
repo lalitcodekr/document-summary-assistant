@@ -19,7 +19,6 @@ function useCopyToClipboard(timeout = 2000) {
         setCopied(true);
         setTimeout(() => setCopied(false), timeout);
       } catch {
-        // Fallback
         const el = document.createElement("textarea");
         el.value = text;
         el.style.cssText = "position:fixed;opacity:0;pointer-events:none";
@@ -73,6 +72,22 @@ function buildDownloadText(result: ProcessResult, documentName: string): string 
   return lines.join("\n");
 }
 
+const btnBase: React.CSSProperties = {
+  fontFamily: "'Patrick Hand', cursive",
+  fontSize: "0.95rem",
+  color: "#2d2d2d",
+  background: "#ffffff",
+  border: "2px solid #2d2d2d",
+  borderRadius: "255px 15px 225px 15px / 15px 225px 15px 255px",
+  boxShadow: "4px 4px 0px 0px #2d2d2d",
+  padding: "0.55rem 1.3rem",
+  display: "flex",
+  alignItems: "center",
+  gap: "0.5rem",
+  cursor: "pointer",
+  transition: "all 0.1s ease",
+};
+
 export function SummaryActions({ result, documentName }: SummaryActionsProps) {
   const { copied, copy } = useCopyToClipboard();
 
@@ -89,6 +104,13 @@ export function SummaryActions({ result, documentName }: SummaryActionsProps) {
     URL.revokeObjectURL(url);
   };
 
+  const handleHover = (el: HTMLElement, hovered: boolean) => {
+    el.style.background = hovered ? "#2d5da1" : "#ffffff";
+    el.style.color = hovered ? "#ffffff" : "#2d2d2d";
+    el.style.boxShadow = hovered ? "2px 2px 0px 0px #2d2d2d" : "4px 4px 0px 0px #2d2d2d";
+    el.style.transform = hovered ? "translate(2px, 2px)" : "translate(0, 0)";
+  };
+
   return (
     <motion.div
       className="flex flex-wrap items-center gap-3"
@@ -96,10 +118,18 @@ export function SummaryActions({ result, documentName }: SummaryActionsProps) {
       animate={{ opacity: 1 }}
       transition={{ delay: 0.55 }}
     >
+      {/* Copy Summary */}
       <button
         onClick={() => copy(result.summary)}
-        className="flex items-center gap-2 text-sm text-white/70 hover:text-white border border-white/10 hover:border-white/25 rounded-full px-5 py-2.5 backdrop-blur-sm bg-white/[0.03] hover:bg-white/[0.06] transition-all"
+        style={btnBase}
         aria-label="Copy summary to clipboard"
+        onMouseEnter={(e) => handleHover(e.currentTarget, true)}
+        onMouseLeave={(e) => handleHover(e.currentTarget, false)}
+        onMouseDown={(e) => {
+          (e.currentTarget as HTMLElement).style.boxShadow = "0px 0px 0px 0px #2d2d2d";
+          (e.currentTarget as HTMLElement).style.transform = "translate(4px, 4px)";
+        }}
+        onMouseUp={(e) => handleHover(e.currentTarget, true)}
       >
         <AnimatePresence mode="wait" initial={false}>
           {copied ? (
@@ -110,7 +140,7 @@ export function SummaryActions({ result, documentName }: SummaryActionsProps) {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.85 }}
             >
-              <Check className="w-3.5 h-3.5 text-emerald-400" aria-hidden />
+              <Check className="w-4 h-4" strokeWidth={2.5} style={{ color: "#2d2d2d" }} aria-hidden />
               Copied!
             </motion.span>
           ) : (
@@ -121,19 +151,30 @@ export function SummaryActions({ result, documentName }: SummaryActionsProps) {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.85 }}
             >
-              <Copy className="w-3.5 h-3.5" aria-hidden />
+              <Copy className="w-4 h-4" strokeWidth={2.5} aria-hidden />
               Copy Summary
             </motion.span>
           )}
         </AnimatePresence>
       </button>
 
+      {/* Download */}
       <button
         onClick={handleDownload}
-        className="flex items-center gap-2 text-sm text-white/70 hover:text-white border border-white/10 hover:border-white/25 rounded-full px-5 py-2.5 backdrop-blur-sm bg-white/[0.03] hover:bg-white/[0.06] transition-all"
+        style={{
+          ...btnBase,
+          borderRadius: "15px 255px 15px 225px / 225px 15px 255px 15px",
+        }}
         aria-label="Download summary as text file"
+        onMouseEnter={(e) => handleHover(e.currentTarget, true)}
+        onMouseLeave={(e) => handleHover(e.currentTarget, false)}
+        onMouseDown={(e) => {
+          (e.currentTarget as HTMLElement).style.boxShadow = "0px 0px 0px 0px #2d2d2d";
+          (e.currentTarget as HTMLElement).style.transform = "translate(4px, 4px)";
+        }}
+        onMouseUp={(e) => handleHover(e.currentTarget, true)}
       >
-        <Download className="w-3.5 h-3.5" aria-hidden />
+        <Download className="w-4 h-4" strokeWidth={2.5} aria-hidden />
         Download .txt
       </button>
     </motion.div>

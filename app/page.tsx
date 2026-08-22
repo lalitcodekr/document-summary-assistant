@@ -1,7 +1,7 @@
 "use client";
 
-import { DocSummaryHero } from "@/components/DocSummaryHero";
+import { MainframeHero } from "@/components/MainframeHero";
 
 export default function HomePage() {
-  return <DocSummaryHero />;
+  return <MainframeHero />;
 }

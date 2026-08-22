@@ -3,10 +3,10 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { FileText, GitBranch, HelpCircle, Menu, X } from "lucide-react";
 import type { AppStage, ErrorCode, ProcessResult, SummaryLength } from "@/types";
 import { saveSummaryData } from "@/lib/summary-storage";
 import { UploadZone } from "./UploadZone";
+import { CursorGlow } from "./CursorGlow";
 
 // ─────────────────────────────────────────────
 // 1. BACKGROUND VIDEO (3D MODEL) — UNCHANGED
@@ -16,42 +16,45 @@ import { UploadZone } from "./UploadZone";
 function HeroBackgroundVideo() {
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  // Desktop mouse-scrub hook — PRESERVED EXACTLY
+  // Desktop mouse-scrub hook — throttled to one seek per RAF frame to prevent jank
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
     let targetTime = 0;
     let prevX: number | null = null;
-
-    const onSeeked = () => {
-      // intentional no-op — ensures smooth frame tracking
-    };
+    let pendingX: number | null = null;
+    let rafId: number;
 
     const onMouseMove = (e: MouseEvent) => {
       if (window.innerWidth < 1024) return; // disable on mobile
-      if (!video.duration) return;
-
-      const currentX = e.clientX;
-      if (prevX === null) {
-        prevX = currentX;
-        return;
-      }
-
-      const delta = currentX - prevX;
-      prevX = currentX;
-
-      targetTime += (delta / window.innerWidth) * 0.8 * video.duration;
-      targetTime = Math.max(0, Math.min(video.duration, targetTime));
-      video.currentTime = targetTime;
+      pendingX = e.clientX;
     };
 
-    video.addEventListener("seeked", onSeeked);
-    window.addEventListener("mousemove", onMouseMove);
+    const tick = () => {
+      if (pendingX !== null && video.duration) {
+        const currentX = pendingX;
+        pendingX = null;
+
+        if (prevX === null) {
+          prevX = currentX;
+        } else {
+          const delta = currentX - prevX;
+          prevX = currentX;
+          targetTime += (delta / window.innerWidth) * 0.8 * video.duration;
+          targetTime = Math.max(0, Math.min(video.duration, targetTime));
+          video.currentTime = targetTime;
+        }
+      }
+      rafId = requestAnimationFrame(tick);
+    };
+    rafId = requestAnimationFrame(tick);
+
+    window.addEventListener("mousemove", onMouseMove, { passive: true });
 
     return () => {
       window.removeEventListener("mousemove", onMouseMove);
-      video.removeEventListener("seeked", onSeeked);
+      cancelAnimationFrame(rafId);
     };
   }, []);
 
@@ -94,140 +97,10 @@ function HeroBackgroundVideo() {
 }
 
 // ─────────────────────────────────────────────
-// 2. NAVBAR — DocSummary branding
-// ─────────────────────────────────────────────
-const NAV_LINKS = [
-  { label: "How it works", href: "#upload-zone", scroll: true },
-  { label: "Supported files", href: "#upload-zone", scroll: true },
-  { label: "GitHub", href: "https://github.com", external: true },
-] as const;
-
-interface HeroNavbarProps {
-  onUploadClick: () => void;
-}
-
-function HeroNavbar({ onUploadClick }: HeroNavbarProps) {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  const toggleMenu = useCallback(() => {
-    setIsMobileMenuOpen((prev) => !prev);
-  }, []);
-
-  const handleNavLinkClick = useCallback(
-    (e: React.MouseEvent<HTMLAnchorElement>, link: (typeof NAV_LINKS)[number]) => {
-      if ("scroll" in link && link.scroll) {
-        e.preventDefault();
-        setIsMobileMenuOpen(false);
-        onUploadClick();
-      }
-    },
-    [onUploadClick]
-  );
-
-  return (
-    <>
-      <header className="fixed top-0 inset-x-0 z-10 px-5 sm:px-8 py-4 sm:py-5 flex flex-row justify-between items-center bg-transparent">
-        {/* Logo */}
-        <div className="flex flex-row items-center gap-2">
-          <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-black" aria-hidden />
-          <span className="text-[21px] sm:text-[26px] tracking-tight text-black font-medium select-none">
-            DocSummary
-          </span>
-        </div>
-
-        {/* Desktop nav links (center) */}
-        <nav className="hidden md:flex flex-row items-center text-[20px] text-black" aria-label="Main navigation">
-          {NAV_LINKS.map((link, i) => (
-            <React.Fragment key={link.label}>
-              <a
-                href={link.href}
-                target={"external" in link && link.external ? "_blank" : undefined}
-                rel={"external" in link && link.external ? "noopener noreferrer" : undefined}
-                className="hover:opacity-60 transition-opacity cursor-pointer"
-                onClick={(e) => handleNavLinkClick(e, link)}
-              >
-                {link.label}
-              </a>
-              {i < NAV_LINKS.length - 1 && (
-                <span className="opacity-40">,&nbsp;</span>
-              )}
-            </React.Fragment>
-          ))}
-        </nav>
-
-        {/* Desktop CTA */}
-        <button
-          onClick={onUploadClick}
-          className="hidden md:inline-block text-[20px] text-black underline underline-offset-2 hover:opacity-60 transition-opacity"
-        >
-          Upload Document
-        </button>
-
-        {/* Mobile hamburger */}
-        <button
-          className="md:hidden flex flex-col justify-center gap-[5px] w-8 h-8 z-20 relative"
-          onClick={toggleMenu}
-          aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
-          aria-expanded={isMobileMenuOpen}
-        >
-          <span
-            className={`w-6 h-[2px] bg-black block transition-all duration-300 ${
-              isMobileMenuOpen ? "rotate-45 translate-y-[7px]" : ""
-            }`}
-          />
-          <span
-            className={`w-6 h-[2px] bg-black block transition-all duration-300 ${
-              isMobileMenuOpen ? "opacity-0" : ""
-            }`}
-          />
-          <span
-            className={`w-6 h-[2px] bg-black block transition-all duration-300 ${
-              isMobileMenuOpen ? "-rotate-45 -translate-y-[7px]" : ""
-            }`}
-          />
-        </button>
-      </header>
-
-      {/* Mobile full-screen overlay */}
-      <div
-        className={`fixed inset-0 z-[9] bg-white/95 backdrop-blur-sm flex flex-col items-center justify-center gap-8 transition-all duration-300 lg:hidden ${
-          isMobileMenuOpen
-            ? "opacity-100 pointer-events-auto"
-            : "opacity-0 pointer-events-none"
-        }`}
-        aria-hidden={!isMobileMenuOpen}
-      >
-        <nav className="flex flex-col items-center gap-6" aria-label="Mobile navigation">
-          {NAV_LINKS.map((link) => (
-            <a
-              key={link.label}
-              href={link.href}
-              target={"external" in link && link.external ? "_blank" : undefined}
-              rel={"external" in link && link.external ? "noopener noreferrer" : undefined}
-              className="text-4xl font-medium text-black hover:opacity-60 transition-opacity cursor-pointer"
-              onClick={(e) => handleNavLinkClick(e, link)}
-            >
-              {link.label}
-            </a>
-          ))}
-          <button
-            onClick={() => {
-              setIsMobileMenuOpen(false);
-              onUploadClick();
-            }}
-            className="text-4xl font-medium text-black underline underline-offset-4 hover:opacity-60 transition-opacity"
-          >
-            Upload Document
-          </button>
-        </nav>
-      </div>
-    </>
-  );
-}
-
-// ─────────────────────────────────────────────
 // 3. TYPEWRITER HOOK
 // ─────────────────────────────────────────────
+const CYCLING_WORDS = ["understood.", "analyzed.", "summarized.", "simplified."];
+
 function useTypewriter(
   text: string,
   speed = 38,
@@ -277,8 +150,18 @@ export function DocSummaryHero() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const { displayed, done } = useTypewriter("Every document,\nunderstood.", 38, 600);
+  const [wordIndex, setWordIndex] = useState(0);
 
-  // Scroll upload zone into view when nav CTA is clicked
+  // Start word cycling once typewriter finishes
+  useEffect(() => {
+    if (!done) return;
+    const id = setInterval(() => {
+      setWordIndex((prev) => (prev + 1) % CYCLING_WORDS.length);
+    }, 2000);
+    return () => clearInterval(id);
+  }, [done]);
+
+  // Scroll upload zone into view
   const scrollToUpload = useCallback(() => {
     uploadZoneRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
   }, []);
@@ -352,11 +235,10 @@ export function DocSummaryHero() {
 
   return (
     <div className="relative bg-white text-neutral-900 font-sans selection:bg-[#EAECE9] selection:text-[#1C2E1E] antialiased overflow-x-hidden flex flex-col lg:block lg:min-h-screen">
+      {/* Cursor-following green glow */}
+      <CursorGlow />
       {/* Background video — 3D model with cursor scrub */}
       <HeroBackgroundVideo />
-
-      {/* Navbar */}
-      <HeroNavbar onUploadClick={scrollToUpload} />
 
       {/* Content layer */}
       <div className="relative z-10 flex flex-col order-first lg:order-none w-full bg-white lg:bg-transparent pb-8 lg:pb-0 lg:min-h-screen">
@@ -370,13 +252,31 @@ export function DocSummaryHero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <h1 className="text-5xl md:text-6xl lg:text-[76px] font-normal tracking-tight text-black leading-[1.08] mb-8 select-none w-full whitespace-pre-wrap">
-              {displayed}
-              {!done && (
-                <span
-                  aria-hidden="true"
-                  className="inline-block w-[2px] h-[1.1em] bg-black align-middle ml-[2px] animate-blink"
-                />
+            <h1 className="text-5xl md:text-6xl lg:text-[76px] font-normal tracking-tight text-black leading-[1.08] mb-8 select-none w-full">
+              {done ? (
+                <>
+                  <span className="whitespace-pre-wrap">{"Every document,\n"}</span>
+                  <AnimatePresence mode="wait">
+                    <motion.span
+                      key={wordIndex}
+                      initial={{ opacity: 0, y: 12 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -12 }}
+                      transition={{ duration: 0.45, ease: "easeInOut" }}
+                      className="inline-block"
+                    >
+                      {CYCLING_WORDS[wordIndex]}
+                    </motion.span>
+                  </AnimatePresence>
+                </>
+              ) : (
+                <span className="whitespace-pre-wrap">
+                  {displayed}
+                  <span
+                    aria-hidden="true"
+                    className="inline-block w-[2px] h-[1.1em] bg-black align-middle ml-[2px] animate-blink"
+                  />
+                </span>
               )}
             </h1>
           </motion.div>

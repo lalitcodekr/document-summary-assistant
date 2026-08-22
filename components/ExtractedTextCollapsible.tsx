@@ -19,14 +19,24 @@ export function ExtractedTextCollapsible({ text }: ExtractedTextCollapsibleProps
     >
       <button
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-1.5 text-xs text-white/25 hover:text-white/45 transition-colors cursor-pointer mb-3"
+        className="flex items-center gap-2 transition-all"
+        style={{
+          fontFamily: "'Patrick Hand', cursive",
+          fontSize: "0.85rem",
+          color: open ? "#2d2d2d" : "rgba(45,45,45,0.5)",
+          background: "transparent",
+          border: "none",
+          cursor: "pointer",
+          marginBottom: 12,
+          padding: 0,
+        }}
         aria-expanded={open}
         aria-controls="extracted-text-content"
       >
         {open ? (
-          <ChevronUp className="w-3.5 h-3.5" aria-hidden />
+          <ChevronUp className="w-4 h-4" strokeWidth={2.5} aria-hidden />
         ) : (
-          <ChevronDown className="w-3.5 h-3.5" aria-hidden />
+          <ChevronDown className="w-4 h-4" strokeWidth={2.5} aria-hidden />
         )}
         {open ? "Hide" : "Show"} extracted text preview
       </button>
@@ -41,11 +51,39 @@ export function ExtractedTextCollapsible({ text }: ExtractedTextCollapsibleProps
             transition={{ duration: 0.3 }}
             className="overflow-hidden"
           >
-            <div className="relative rounded-2xl overflow-hidden border border-white/[0.08] bg-white/[0.02] backdrop-blur-xl p-5">
-              <p className="text-xs text-white/25 tracking-widest uppercase mb-3 font-semibold">
-                Extracted Text Preview
+            <div
+              style={{
+                background: "#ffffff",
+                border: "2px dashed #2d2d2d",
+                borderRadius: "15px 255px 15px 225px / 225px 15px 255px 15px",
+                boxShadow: "4px 4px 0px 0px rgba(45,45,45,0.2)",
+                padding: "1.25rem 1.5rem",
+                transform: "rotate(0.3deg)",
+              }}
+            >
+              <p
+                style={{
+                  fontFamily: "'Patrick Hand', cursive",
+                  fontSize: "0.7rem",
+                  letterSpacing: "0.2em",
+                  textTransform: "uppercase",
+                  color: "rgba(45,45,45,0.45)",
+                  marginBottom: "0.6rem",
+                  fontWeight: 400,
+                }}
+              >
+                📃 Extracted Text Preview
               </p>
-              <p className="text-white/35 text-xs leading-relaxed font-mono whitespace-pre-wrap break-words">
+              <p
+                style={{
+                  fontFamily: "monospace",
+                  fontSize: "0.78rem",
+                  lineHeight: 1.65,
+                  color: "rgba(45,45,45,0.55)",
+                  whiteSpace: "pre-wrap",
+                  wordBreak: "break-word",
+                }}
+              >
                 {text}
               </p>
             </div>

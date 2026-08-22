@@ -35,19 +35,22 @@ const STAGES: {
   },
 ];
 
+const WOBBLY_SM = "15px 225px 15px 255px / 255px 15px 225px 15px";
+
 export function ProcessingState({ stage }: ProcessingStateProps) {
   const current = STAGES.find((s) => s.key === stage) ?? STAGES[0];
   const Icon = current.icon;
   const stageIndex = STAGES.findIndex((s) => s.key === stage);
 
   return (
-    <div className="flex flex-col items-center gap-6 py-10 px-6 w-full max-w-md mx-auto">
+    <div className="flex flex-col items-center gap-6 py-12 px-6 w-full max-w-md mx-auto" style={{ fontFamily: "'Patrick Hand', cursive" }}>
       {/* Animated icon container */}
       <div className="relative">
         <motion.div
-          className="w-16 h-16 liquid-glass rounded-2xl flex items-center justify-center"
-          animate={{ scale: [1, 1.06, 1] }}
-          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          className="w-20 h-20 bg-[#fff9c4] border-[3px] border-[#2d2d2d] flex items-center justify-center z-10 relative"
+          style={{ borderRadius: WOBBLY_SM, boxShadow: "4px 4px 0px 0px #2d2d2d" }}
+          animate={{ rotate: [-2, 2, -2], y: [0, -5, 0] }}
+          transition={{ duration: 0.5, repeat: Infinity, ease: "easeInOut" }}
         >
           <AnimatePresence mode="wait">
             <motion.div
@@ -57,16 +60,17 @@ export function ProcessingState({ stage }: ProcessingStateProps) {
               exit={{ opacity: 0, scale: 0.7 }}
               transition={{ duration: 0.3 }}
             >
-              <Icon className="w-7 h-7 text-black/80" />
+              <Icon className="w-10 h-10 text-[#2d2d2d]" strokeWidth={2.5} />
             </motion.div>
           </AnimatePresence>
         </motion.div>
 
-        {/* Pulsing ring */}
+        {/* Scribble effect behind icon */}
         <motion.div
-          className="absolute inset-0 rounded-2xl border border-black/20"
-          animate={{ scale: [1, 1.3, 1], opacity: [0.4, 0, 0.4] }}
-          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute inset-[-10px] border-[2px] border-dashed border-[#2d2d2d]/30 pointer-events-none"
+          style={{ borderRadius: "50%" }}
+          animate={{ rotate: 360 }}
+          transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
         />
       </div>
 
@@ -74,50 +78,41 @@ export function ProcessingState({ stage }: ProcessingStateProps) {
       <AnimatePresence mode="wait">
         <motion.div
           key={stage}
-          className="text-center"
+          className="text-center mt-2"
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -8 }}
           transition={{ duration: 0.4 }}
         >
-          <p className="text-black font-medium text-lg">{current.label}</p>
-          <p className="text-black/40 text-sm mt-1">{current.sublabel}</p>
+          <p className="text-[#2d2d2d] font-bold text-3xl" style={{ fontFamily: "'Kalam', cursive" }}>{current.label}</p>
+          <p className="text-[#2d2d2d]/60 text-xl mt-1">{current.sublabel}</p>
         </motion.div>
       </AnimatePresence>
 
-      {/* Progress steps */}
-      <div className="flex items-center gap-2">
+      {/* Progress steps (hand-drawn blocks) */}
+      <div className="flex items-center gap-3 mt-4">
         {STAGES.map((s, i) => (
           <React.Fragment key={s.key}>
             <motion.div
-              className="h-1 rounded-full"
-              style={{ width: 32 }}
+              className="h-4 border-2 border-[#2d2d2d]"
+              style={{ width: 40, borderRadius: WOBBLY_SM }}
               animate={{
                 backgroundColor:
                   i < stageIndex
-                    ? "rgba(0,0,0,0.7)"
+                    ? "#2d2d2d"
                     : i === stageIndex
-                    ? "rgba(0,0,0,1)"
-                    : "rgba(0,0,0,0.15)",
+                    ? "#ff4d4d"
+                    : "transparent",
+                rotate: i % 2 === 0 ? 2 : -2,
+                scale: i === stageIndex ? 1.1 : 1
               }}
               transition={{ duration: 0.4 }}
             />
             {i < STAGES.length - 1 && (
-              <div className="w-1 h-1 rounded-full bg-black/20" />
+              <div className="w-6 h-0 border-b-2 border-dashed border-[#2d2d2d]/40" />
             )}
           </React.Fragment>
         ))}
-      </div>
-
-      {/* Thin progress bar at bottom */}
-      <div className="w-full h-px bg-black/10 rounded-full overflow-hidden">
-        <motion.div
-          className="h-full bg-black/50 progress-pulse"
-          animate={{
-            width: stage === "uploading" ? "25%" : stage === "extracting" ? "60%" : "90%",
-          }}
-          transition={{ duration: 1.2, ease: "easeOut" }}
-        />
       </div>
     </div>
   );

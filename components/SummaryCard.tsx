@@ -11,15 +11,19 @@ interface SummaryCardProps {
 
 function SkeletonLines() {
   return (
-    <div className="space-y-3 animate-pulse" aria-label="Generating summary…" role="status">
-      {[100, 90, 95, 85, 80].map((w, i) => (
+    <div className="space-y-3" aria-label="Generating summary…" role="status">
+      {[100, 88, 95, 78, 85].map((w, i) => (
         <div
           key={i}
-          className="h-4 bg-white/[0.06] rounded-full"
-          style={{ width: `${w}%` }}
+          style={{
+            height: 16,
+            background: "rgba(45,45,45,0.1)",
+            borderRadius: "8px 2px 8px 2px / 2px 8px 2px 8px",
+            width: `${w}%`,
+            animation: `pulse 1.4s ease-in-out ${i * 0.12}s infinite`,
+          }}
         />
       ))}
-      <div className="h-4 bg-white/[0.06] rounded-full w-3/5" />
       <p className="sr-only">Generating summary…</p>
     </div>
   );
@@ -28,51 +32,93 @@ function SkeletonLines() {
 export function SummaryCard({ summary, isLoading = false }: SummaryCardProps) {
   return (
     <motion.div
-      className="relative rounded-2xl overflow-hidden border border-white/[0.08] bg-white/[0.03] backdrop-blur-xl"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+      style={{
+        position: "relative",
+        background: "#ffffff",
+        border: "3px solid #2d2d2d",
+        borderRadius: "255px 15px 225px 15px / 15px 225px 15px 255px",
+        boxShadow: "6px 6px 0px 0px #2d2d2d",
+        padding: "2rem 2.25rem",
+        transform: "rotate(-0.4deg)",
+      }}
     >
-      {/* Top glow line */}
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-      {/* Subtle blue inner glow */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/[0.03] via-transparent to-transparent pointer-events-none" />
+      {/* Tape decoration */}
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          top: -14,
+          left: "50%",
+          transform: "translateX(-50%) rotate(-2deg)",
+          width: 80,
+          height: 26,
+          background: "rgba(45,45,45,0.12)",
+          borderRadius: "3px",
+          border: "1px solid rgba(45,45,45,0.18)",
+        }}
+      />
 
-      <div className="relative p-7 sm:p-9">
-        <div className="flex items-center gap-2 mb-6">
-          <div className="w-6 h-6 rounded-lg bg-white/[0.08] flex items-center justify-center">
-            <FileText className="w-3.5 h-3.5 text-white/60" aria-hidden />
-          </div>
-          <span className="text-xs font-semibold tracking-widest uppercase text-white/40">
-            Executive Summary
-          </span>
+      {/* Section label */}
+      <div className="flex items-center gap-2 mb-5">
+        <div
+          style={{
+            width: 28,
+            height: 28,
+            background: "#2d2d2d",
+            borderRadius: "8px 2px 8px 2px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexShrink: 0,
+          }}
+        >
+          <FileText className="w-4 h-4" style={{ color: "#fdfbf7" }} aria-hidden />
         </div>
-
-        <AnimatePresence mode="wait">
-          {isLoading ? (
-            <motion.div
-              key="skeleton"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.25 }}
-            >
-              <SkeletonLines />
-            </motion.div>
-          ) : (
-            <motion.p
-              key="text"
-              className="text-white/80 leading-[1.85] text-base md:text-lg"
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -6 }}
-              transition={{ duration: 0.4 }}
-            >
-              {summary}
-            </motion.p>
-          )}
-        </AnimatePresence>
+        <span
+          style={{
+            fontFamily: "'Kalam', cursive",
+            fontWeight: 700,
+            fontSize: "0.95rem",
+            color: "#2d2d2d",
+            letterSpacing: "0.08em",
+          }}
+        >
+          Executive Summary
+        </span>
       </div>
+
+      <AnimatePresence mode="wait">
+        {isLoading ? (
+          <motion.div
+            key="skeleton"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+          >
+            <SkeletonLines />
+          </motion.div>
+        ) : (
+          <motion.p
+            key="text"
+            style={{
+              fontFamily: "'Patrick Hand', cursive",
+              fontSize: "1.05rem",
+              lineHeight: 1.85,
+              color: "#2d2d2d",
+            }}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.4 }}
+          >
+            {summary}
+          </motion.p>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }

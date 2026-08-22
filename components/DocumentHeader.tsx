@@ -26,41 +26,92 @@ export function DocumentHeader({ documentName, result }: DocumentHeaderProps) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
     >
-      {/* Section label */}
-      <p className="text-xs tracking-[0.25em] uppercase text-white/25 mb-4 font-semibold">
-        Document Summary
-      </p>
+      {/* Section label sticky-note tag */}
+      <div className="flex items-center gap-3 mb-5">
+        <span
+          style={{
+            fontFamily: "'Patrick Hand', cursive",
+            fontSize: "0.75rem",
+            fontWeight: 400,
+            letterSpacing: "0.18em",
+            textTransform: "uppercase",
+            background: "#fff9c4",
+            color: "#2d2d2d",
+            border: "2px solid #2d2d2d",
+            borderRadius: "3px 12px 3px 12px / 12px 3px 12px 3px",
+            boxShadow: "2px 2px 0px 0px #2d2d2d",
+            padding: "2px 10px",
+            display: "inline-block",
+            transform: "rotate(-1deg)",
+          }}
+        >
+          📄 Document Summary
+        </span>
+      </div>
 
-      {/* Divider */}
-      <div className="h-px bg-gradient-to-r from-white/10 via-white/20 to-transparent mb-6" />
+      {/* Dashed divider — hand-drawn style */}
+      <div
+        aria-hidden
+        style={{
+          borderTop: "2px dashed rgba(45,45,45,0.2)",
+          marginBottom: "1.25rem",
+        }}
+      />
 
       {/* Document name */}
-      <h1 className="font-serif text-2xl sm:text-3xl text-white tracking-tight mb-3 break-words leading-tight">
+      <h1
+        style={{
+          fontFamily: "'Kalam', cursive",
+          fontWeight: 700,
+          fontSize: "clamp(1.6rem, 4vw, 2.4rem)",
+          color: "#2d2d2d",
+          lineHeight: 1.25,
+          marginBottom: "0.85rem",
+          wordBreak: "break-word",
+        }}
+      >
         {documentName}
       </h1>
 
       {/* Metadata pills */}
       <div className="flex items-center gap-2 flex-wrap">
-        <span className="flex items-center gap-1.5 text-xs text-white/40 bg-white/[0.05] border border-white/[0.08] rounded-full px-3 py-1">
-          {isImage ? (
-            <ImageIcon className="w-3 h-3" aria-hidden />
-          ) : (
-            <FileText className="w-3 h-3" aria-hidden />
-          )}
-          {isImage ? "Image · OCR processed" : "PDF"}
-        </span>
-
-        {pages > 0 && (
-          <span className="flex items-center gap-1.5 text-xs text-white/40 bg-white/[0.05] border border-white/[0.08] rounded-full px-3 py-1">
-            <Layers className="w-3 h-3" aria-hidden />
-            {pages} page{pages !== 1 ? "s" : ""}
+        {[
+          {
+            icon: isImage ? (
+              <ImageIcon className="w-3 h-3" aria-hidden />
+            ) : (
+              <FileText className="w-3 h-3" aria-hidden />
+            ),
+            label: isImage ? "Image · OCR" : "PDF",
+          },
+          ...(pages > 0
+            ? [{ icon: <Layers className="w-3 h-3" aria-hidden />, label: `${pages} page${pages !== 1 ? "s" : ""}` }]
+            : []),
+          {
+            icon: <Clock className="w-3 h-3" aria-hidden />,
+            label: `⚡ ${formatTime(processingTimeMs)}`,
+          },
+        ].map((item, i) => (
+          <span
+            key={i}
+            className="flex items-center gap-1.5"
+            style={{
+              fontFamily: "'Patrick Hand', cursive",
+              fontSize: "0.8rem",
+              color: "#2d2d2d",
+              background: "#ffffff",
+              border: "2px solid #2d2d2d",
+              borderRadius: i % 2 === 0
+                ? "255px 15px 225px 15px / 15px 225px 15px 255px"
+                : "15px 255px 15px 225px / 225px 15px 255px 15px",
+              boxShadow: "2px 2px 0px 0px #2d2d2d",
+              padding: "2px 10px",
+            }}
+          >
+            {item.icon}
+            {item.label}
           </span>
-        )}
-
-        <span className="flex items-center gap-1.5 text-xs text-white/40 bg-white/[0.05] border border-white/[0.08] rounded-full px-3 py-1">
-          <Clock className="w-3 h-3" aria-hidden />
-          Processed in {formatTime(processingTimeMs)}
-        </span>
+        ))}
       </div>
     </motion.div>
   );
