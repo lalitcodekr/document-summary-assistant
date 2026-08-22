@@ -97,8 +97,8 @@ function HeroBackgroundVideo() {
 // 2. NAVBAR — DocSummary branding
 // ─────────────────────────────────────────────
 const NAV_LINKS = [
-  { label: "How it works", href: "#how-it-works" },
-  { label: "Supported files", href: "#supported-files" },
+  { label: "How it works", href: "#upload-zone", scroll: true },
+  { label: "Supported files", href: "#upload-zone", scroll: true },
   { label: "GitHub", href: "https://github.com", external: true },
 ] as const;
 
@@ -112,6 +112,17 @@ function HeroNavbar({ onUploadClick }: HeroNavbarProps) {
   const toggleMenu = useCallback(() => {
     setIsMobileMenuOpen((prev) => !prev);
   }, []);
+
+  const handleNavLinkClick = useCallback(
+    (e: React.MouseEvent<HTMLAnchorElement>, link: (typeof NAV_LINKS)[number]) => {
+      if ("scroll" in link && link.scroll) {
+        e.preventDefault();
+        setIsMobileMenuOpen(false);
+        onUploadClick();
+      }
+    },
+    [onUploadClick]
+  );
 
   return (
     <>
@@ -132,7 +143,8 @@ function HeroNavbar({ onUploadClick }: HeroNavbarProps) {
                 href={link.href}
                 target={"external" in link && link.external ? "_blank" : undefined}
                 rel={"external" in link && link.external ? "noopener noreferrer" : undefined}
-                className="hover:opacity-60 transition-opacity"
+                className="hover:opacity-60 transition-opacity cursor-pointer"
+                onClick={(e) => handleNavLinkClick(e, link)}
               >
                 {link.label}
               </a>
@@ -192,8 +204,8 @@ function HeroNavbar({ onUploadClick }: HeroNavbarProps) {
               href={link.href}
               target={"external" in link && link.external ? "_blank" : undefined}
               rel={"external" in link && link.external ? "noopener noreferrer" : undefined}
-              className="text-4xl font-medium text-black hover:opacity-60 transition-opacity"
-              onClick={() => setIsMobileMenuOpen(false)}
+              className="text-4xl font-medium text-black hover:opacity-60 transition-opacity cursor-pointer"
+              onClick={(e) => handleNavLinkClick(e, link)}
             >
               {link.label}
             </a>

@@ -64,9 +64,6 @@ export default function SummaryPage() {
     [documentName, extractedText]
   );
 
-  // ── Always render; show hero regardless of document state ──────────────
-  // (early returns would prevent SentinelHeroSection from appearing)
-
   return (
     <div className="min-h-screen" style={{ background: "hsl(var(--hero-bg))" }}>
       {/* ── Interactive Spline 3D background — fixed, always present ─────── */}
@@ -78,18 +75,15 @@ export default function SummaryPage() {
       )}
 
       {/* ── Empty state: no document uploaded ─────────────────────────────── */}
-      {/* Wrapper ensures EmptySummaryState sits above the Spline canvas (z-0) */}
       {mounted && !result && (
-        <div className="relative" style={{ zIndex: 10, pointerEvents: "none" }}>
-          <div style={{ pointerEvents: "auto" }}>
-            <EmptySummaryState />
-          </div>
+        <div className="relative" style={{ zIndex: 10 }}>
+          <EmptySummaryState />
         </div>
       )}
 
       {/* ── Document summary results ───────────────────────────────────────── */}
       {mounted && result && (
-        <div className="relative overflow-x-hidden" style={{ zIndex: 10, pointerEvents: "none" }}>
+        <div className="relative" style={{ zIndex: 10 }}>
           {/* Soft bottom-edge green accent — purely decorative, no pointer events */}
           <div
             className="fixed inset-0 pointer-events-none"
@@ -101,15 +95,12 @@ export default function SummaryPage() {
           />
 
           {/* Sticky summary navbar */}
-          <div style={{ pointerEvents: "auto" }}>
-            <SummaryPageNavbar />
-          </div>
+          <SummaryPageNavbar />
 
           {/* Main content */}
           <main
             className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-36 pb-24"
             aria-label="Document summary"
-            style={{ pointerEvents: "auto" }}
           >
             <motion.div
               className="flex flex-col gap-6"
