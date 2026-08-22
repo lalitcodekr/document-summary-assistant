@@ -9,8 +9,6 @@ const nextConfig: NextConfig = {
   },
   // External packages that should NOT be bundled server-side
   serverExternalPackages: ["tesseract.js", "unpdf"],
-  // Turbopack config (Next.js 16 default bundler)
-  turbopack: {},
 };
 
 export default nextConfig;
