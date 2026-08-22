@@ -39,8 +39,8 @@ const WORD_TARGETS: Record<SummaryLength, number> = {
 // ─── Model config ─────────────────────────────────────────────────────────────
 
 function getModel() {
-  // gemini-3.6-flash is the current recommended model (gemini-2.0-flash was retired).
-  return google("gemini-3.6-flash");
+  // gemini-2.5-flash is the current recommended model.
+  return google("gemini-2.5-flash");
 }
 
 // ─── Single-chunk summarization ───────────────────────────────────────────────

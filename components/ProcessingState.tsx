@@ -102,7 +102,7 @@ export function ProcessingState({ stage }: ProcessingStateProps) {
                     ? "#2d2d2d"
                     : i === stageIndex
                     ? "#ff4d4d"
-                    : "transparent",
+                    : "rgba(0,0,0,0)",
                 rotate: i % 2 === 0 ? 2 : -2,
                 scale: i === stageIndex ? 1.1 : 1
               }}
