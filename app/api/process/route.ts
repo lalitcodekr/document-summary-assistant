@@ -91,7 +91,7 @@ export async function POST(req: NextRequest): Promise<NextResponse<ProcessResult
   try {
     if (isPdf) {
       // Try PDF text layer first
-      const pdfResult = await extractFromPdf(arrayBuffer);
+      const pdfResult = await extractFromPdf(arrayBuffer.slice(0));
       pages = pdfResult.pages;
 
       if (pdfHasTextLayer(pdfResult.text, pdfResult.pages)) {
@@ -100,7 +100,20 @@ export async function POST(req: NextRequest): Promise<NextResponse<ProcessResult
       } else {
         // Scanned PDF — fall through to OCR
         console.log("[/api/process] PDF has no text layer — routing to OCR");
-        extractedText = await ocrImage(buffer);
+        const { renderPageAsImage } = await import("unpdf");
+        
+        let allOcrText = "";
+        const maxPagesToOcr = Math.min(pdfResult.pages, 3); // OCR up to 3 pages to prevent timeout
+        
+        for (let i = 1; i <= maxPagesToOcr; i++) {
+          console.log(`[/api/process] Rendering PDF page ${i} to image...`);
+          const imageBuffer = await renderPageAsImage(new Uint8Array(buffer), i, {
+            canvasImport: () => import('@napi-rs/canvas')
+          });
+          const pageText = await ocrImage(Buffer.from(imageBuffer));
+          allOcrText += pageText + "\n";
+        }
+        extractedText = allOcrText.trim();
         sourceType = "image"; // treated as image-based
       }
     } else {
@@ -108,6 +121,7 @@ export async function POST(req: NextRequest): Promise<NextResponse<ProcessResult
       extractedText = await ocrImage(buffer);
     }
   } catch (err) {
+    console.error("[/api/process] Extraction error:", err);
     const msg = err instanceof Error ? err.message : String(err);
     if (msg === "EXTRACTION_FAILED") {
       return errorResponse("EXTRACTION_FAILED", "Could not extract text from this file. The file may be corrupted or password-protected.");

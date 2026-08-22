@@ -8,7 +8,7 @@ const nextConfig: NextConfig = {
     },
   },
   // External packages that should NOT be bundled server-side
-  serverExternalPackages: ["tesseract.js", "unpdf"],
+  serverExternalPackages: ["tesseract.js", "unpdf", "@napi-rs/canvas"],
 };
 
 export default nextConfig;
