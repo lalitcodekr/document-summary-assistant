@@ -8,7 +8,11 @@ const nextConfig: NextConfig = {
     },
   },
   outputFileTracingIncludes: {
-    "/api/**/*": ["./eng.traineddata.gz"],
+    "/api/**/*": [
+      "./eng.traineddata",
+      "./node_modules/tesseract.js-core/**/*.wasm",
+      "./node_modules/@napi-rs/canvas/**/*.node",
+    ],
   },
   // External packages that should NOT be bundled server-side
   serverExternalPackages: ["tesseract.js", "unpdf", "@napi-rs/canvas"],
