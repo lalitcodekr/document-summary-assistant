@@ -169,12 +169,6 @@ The easiest way to deploy is via [Vercel](https://vercel.com):
 
 ---
 
-## 📝 Approach Write-Up
-
-This project was built to satisfy a technical assessment brief within an 8-hour budget, prioritizing a working end-to-end pipeline over exhaustive features. The architecture unifies PDF parsing and OCR into a single extraction path, so digital and scanned documents are treated consistently by the summarization layer downstream. Gemini 1.5 Flash was chosen for its speed and reliable structured-output support, letting the summary, key points, and improvement suggestions be generated in one call. The UI layers loading and error states at each pipeline stage (upload → extract → summarize) to keep the experience transparent even when processing takes a few seconds. Improvement suggestions were treated as a stretch feature per the brief's ambiguous numbering, and were the first candidate to cut if time ran short — in the end, all core and stretch features shipped within budget.
-
----
-
 ## 📄 License
 
 This project was built for a technical assessment. Feel free to fork and adapt.
